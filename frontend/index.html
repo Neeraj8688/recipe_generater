@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder - Discover Delicious Recipes</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="auth.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <span class="logo-icon">🍳</span>
+                    Recipe Finder
+                </h1>
+                <nav class="nav">
+                    <button class="nav-btn" id="allRecipesBtn">All Recipes</button>
+                    <button class="nav-btn" id="favoritesBtn">Favorites</button>
+                    <div class="user-menu" id="userMenu" style="display:none;">
+                        <span id="username"></span>
+                        <button class="nav-btn" onclick="authService.logout()">Logout</button>
+                    </div>
+                    <button class="nav-btn" id="loginBtn" onclick="window.location.href='login.html'">Login</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-header">
+                    <h2>Find Recipes by Ingredients</h2>
+                    <p>Add ingredients you have at home and discover amazing recipes!</p>
+                </div>
+                
+                <!-- Ingredient Input -->
+                <div class="ingredient-input-container">
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="ingredientInput" 
+                            class="ingredient-input form-control" 
+                            placeholder="Type an ingredient (e.g., chicken, tomatoes)..."
+                            autocomplete="off"
+                        >
+                        <button class="add-ingredient-btn btn btn--primary" id="addIngredientBtn">
+                            Add
+                        </button>
+                    </div>
+                    
+                    <!-- Autocomplete suggestions -->
+                    <div class="autocomplete-suggestions hidden" id="autocompleteSuggestions"></div>
+                </div>
+
+                <!-- Common Ingredients -->
+                <div class="common-ingredients">
+                    <h3>Popular Ingredients:</h3>
+                    <div class="ingredient-tags" id="commonIngredientTags"></div>
+                </div>
+
+                <!-- Selected Ingredients -->
+                <div class="selected-ingredients">
+                    <div class="selected-header">
+                        <h3>Selected Ingredients:</h3>
+                        <button class="btn btn--outline btn--sm" id="clearAllBtn">Clear All</button>
+                    </div>
+                    <div class="selected-tags" id="selectedTags"></div>
+                </div>
+
+                <!-- Find Recipes Button -->
+                <div class="find-recipes-container">
+                    <button class="btn btn--primary btn--lg" id="findRecipesBtn">
+                        🔍 Find Recipes
+                    </button>
+                </div>
+            </section>
+
+            <!-- Filters -->
+            <section class="filters-section hidden" id="filtersSection">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label class="form-label">Cuisine:</label>
+                        <select class="form-control" id="cuisineFilter">
+                            <option value="">All Cuisines</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="form-label">Difficulty:</label>
+                        <select class="form-control" id="difficultyFilter">
+                            <option value="">All Levels</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="form-label">Max Time:</label>
+                        <select class="form-control" id="timeFilter">
+                            <option value="">Any Time</option>
+                            <option value="30">Under 30 min</option>
+                            <option value="60">Under 1 hour</option>
+                            <option value="120">Under 2 hours</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="form-label">Sort by:</label>
+                        <select class="form-control" id="sortFilter">
+                            <option value="relevance">Relevance</option>
+                            <option value="time">Cooking Time</option>
+                            <option value="rating">Rating</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <section class="loading-section hidden" id="loadingSection">
+                <div class="loading-animation">
+                    <div class="cooking-pot">🍲</div>
+                    <div class="loading-text">Cooking up some recipes...</div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection">
+                <div class="results-header hidden" id="resultsHeader">
+                    <h3 id="resultsTitle">Found Recipes</h3>
+                    <div class="results-count" id="resultsCount"></div>
+                </div>
+                
+                <!-- Recipe Grid -->
+                <div class="recipe-grid" id="recipeGrid"></div>
+
+                <!-- Empty State -->
+                <div class="empty-state hidden" id="emptyState">
+                    <div class="empty-icon">🍽️</div>
+                    <h3>No Recipes Found</h3>
+                    <p>Try adding different ingredients or adjusting your filters.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Recipe Modal -->
+    <div class="modal hidden" id="recipeModal">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <div class="modal-actions">
+                    <button class="favorite-btn" id="modalFavoriteBtn">
+                        <span class="favorite-icon">♡</span>
+                    </button>
+                    <button class="modal-close" id="modalClose">✕</button>
+                </div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="recipe-image">
+                    <img id="modalImage" src="" alt="" />
+                </div>
+                
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-icon">⏱️</span>
+                        <span id="modalTime"></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">👨‍🍳</span>
+                        <span id="modalDifficulty"></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">🍽️</span>
+                        <span id="modalServings"></span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">⭐</span>
+                        <span id="modalRating"></span>
+                    </div>
+                </div>
+
+                <div class="recipe-details">
+                    <div class="ingredients-section">
+                        <h3>Ingredients</h3>
+                        <ul class="ingredients-list" id="modalIngredients"></ul>
+                    </div>
+                    
+                    <div class="instructions-section">
+                        <h3>Instructions</h3>
+                        <ol class="instructions-list" id="modalInstructions"></ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
