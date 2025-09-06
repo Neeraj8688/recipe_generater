@@ -1,1 +1,8 @@
+# API proxy to backend service
+/api/*  https://YOUR-BACKEND.onrender.com/api/:splat  200
+
+# ML service proxy
+/ml/*   https://YOUR-ML.onrender.com/api/:splat  200
+
+# SPA fallback (keep this last)
 /*   /index.html    200
