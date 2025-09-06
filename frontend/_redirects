@@ -1,3 +1,8 @@
-/api/*  https://smart-recipe-backend.onrender.com/api/:splat  200
-/ml/*   https://smart-recipe-ml-service.onrender.com/api/:splat  200
+# Backend API proxy
+/api/*  https://recipe-generater.onrender.com/api/:splat  200!
+
+# ML service proxy  
+/ml/*   https://smart-recipe-ml-service.onrender.com/api/:splat  200!
+
+# SPA fallback (must be last)
 /*      /index.html  200

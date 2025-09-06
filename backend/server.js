@@ -89,6 +89,16 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        mongoConnected: hasMongoUri,
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
 // Auth Routes
 app.post('/api/auth/register', async (req, res) => {
     try {
@@ -145,7 +155,10 @@ app.post('/api/auth/register', async (req, res) => {
         
     } catch (error) {
         console.error('Registration error:', error);
-        res.status(500).json({ message: 'Server error during registration' });
+        res.status(500).json({ 
+            message: 'Server error during registration',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 
@@ -193,7 +206,10 @@ app.post('/api/auth/login', async (req, res) => {
         
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error during login' });
+        res.status(500).json({ 
+            message: 'Server error during login',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 
